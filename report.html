@@ -112,7 +112,7 @@
       </div>
     </div>
 
-    <!-- ส่วนที่ 4: สัดส่วนประเภท (แสดงชื่อครบถ้วน 2-3 บรรทัด) และ สัดส่วนสถานะโครงการ -->
+    <!-- ส่วนที่ 4: สัดส่วนประเภท (รองรับ 3 บรรทัด) และ สัดส่วนสถานะโครงการ -->
     <div class="bg-[#151e32] border border-slate-800 rounded-2xl p-5 shadow-sm space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
@@ -130,7 +130,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         
-        <!-- 4.1 สัดส่วนประเภทโครงการ -->
+        <!-- 4.1 สัดส่วนประเภทโครงการ (จัดวางในกล่องเข้ม รองรับชื่อยาวได้ถึง 3 บรรทัด) -->
         <div class="bg-[#090e1a] border border-slate-800/90 rounded-2xl p-5 flex flex-col justify-between shadow-inner">
           <div>
             <div class="flex items-center justify-between">
@@ -155,7 +155,7 @@
           </div>
         </div>
 
-        <!-- 4.2 สัดส่วนสถานะโครงการ -->
+        <!-- 4.2 สัดส่วนสถานะโครงการ (Status Breakdown) -->
         <div class="bg-[#090e1a] border border-slate-800/90 rounded-2xl p-5 flex flex-col justify-between shadow-inner">
           <div>
             <div class="flex items-center justify-between">
@@ -224,7 +224,7 @@
       }
     });
 
-    // 2. กราฟวงกลมสถานะโครงการ
+    // 2. กราฟวงกลมสถานะโครงการ (Status)
     const statusCtx = document.getElementById('statusDoughnutChart').getContext('2d');
     const statusChart = new Chart(statusCtx, {
       type: 'doughnut',
@@ -276,13 +276,13 @@
         console.warn('เชื่อมต่อข้อมูลจริงไม่สำเร็จ กำลังแสดงชุดข้อมูลตัวอย่าง:', err);
         statusText.innerText = "โหมดข้อมูลจำลอง";
         globalProjects = [
-          { fiscalYear: '2568', category: 'โครงการบริการวิชาการแก่สังคมและชุมชนเพื่อการพัฒนาอย่างยั่งยืน', approvedBudget: 450000, disbursedAmount: 450000, status: 'เสร็จสิ้น' },
-          { fiscalYear: '2568', category: 'โครงการวิจัยและพัฒนานวัตกรรมทางการศึกษาและเทคโนโลยีสารสนเทศ', approvedBudget: 500000, disbursedAmount: 470000, status: 'เสร็จสิ้น' },
-          { fiscalYear: '2569', category: 'โครงการบริการวิชาการแก่สังคมและชุมชนเพื่อการพัฒนาอย่างยั่งยืน', approvedBudget: 45000, disbursedAmount: 15000, status: 'อยู่ระหว่างดำเนินงาน' },
-          { fiscalYear: '2569', category: 'โครงการวิจัยและพัฒนานวัตกรรมทางการศึกษาและเทคโนโลยีสารสนเทศ', approvedBudget: 80000, disbursedAmount: 30000, status: 'อยู่ระหว่างดำเนินงาน' },
-          { fiscalYear: '2569', category: 'โครงการพัฒนาและปรับปรุงระบบการจัดการเรียนการสอนแบบผสมผสาน', approvedBudget: 25000, disbursedAmount: 5000, status: 'อยู่ระหว่างดำเนินงาน' },
-          { fiscalYear: '2569', category: 'โครงการทำนุบำรุงศิลปวัฒนธรรมและสืบสานภูมิปัญญาท้องถิ่นอีสาน', approvedBudget: 15000, disbursedAmount: 0, status: 'อนุมัติโครงการ' },
-          { fiscalYear: '2570', category: 'โครงการวิจัยและพัฒนานวัตกรรมทางการศึกษาและเทคโนโลยีสารสนเทศ', approvedBudget: 0, disbursedAmount: 0, status: 'อนุมัติโครงการ' }
+          { fiscalYear: '2568', category: 'โครงการบริการวิชาการแก่สังคมและชุมชนเพื่อการยกระดับคุณภาพชีวิตอย่างยั่งยืน', approvedBudget: 450000, disbursedAmount: 450000, status: 'เสร็จสิ้น' },
+          { fiscalYear: '2568', category: 'โครงการวิจัยและพัฒนานวัตกรรมทางการศึกษาและเทคโนโลยีสารสนเทศเพื่ออนาคต', approvedBudget: 500000, disbursedAmount: 470000, status: 'เสร็จสิ้น' },
+          { fiscalYear: '2569', category: 'โครงการบริการวิชาการแก่สังคมและชุมชนเพื่อการยกระดับคุณภาพชีวิตอย่างยั่งยืน', approvedBudget: 45000, disbursedAmount: 15000, status: 'อยู่ระหว่างดำเนินงาน' },
+          { fiscalYear: '2569', category: 'โครงการวิจัยและพัฒนานวัตกรรมทางการศึกษาและเทคโนโลยีสารสนเทศเพื่ออนาคต', approvedBudget: 80000, disbursedAmount: 30000, status: 'อยู่ระหว่างดำเนินงาน' },
+          { fiscalYear: '2569', category: 'โครงการพัฒนาและปรับปรุงกระบวนการเรียนการสอนแบบผสมผสานยุคดิจิทัล', approvedBudget: 25000, disbursedAmount: 5000, status: 'อยู่ระหว่างดำเนินงาน' },
+          { fiscalYear: '2569', category: 'โครงการทำนุบำรุงศิลปวัฒนธรรมและอนุรักษ์สืบสานภูมิปัญญาท้องถิ่นอีสาน', approvedBudget: 15000, disbursedAmount: 0, status: 'อนุมัติโครงการ' },
+          { fiscalYear: '2570', category: 'โครงการวิจัยและพัฒนานวัตกรรมทางการศึกษาและเทคโนโลยีสารสนเทศเพื่ออนาคต', approvedBudget: 0, disbursedAmount: 0, status: 'อนุมัติโครงการ' }
         ];
         globalFiscalYears = [
           { fiscalYear: '2568', totalBudget: 1200000 },
@@ -428,7 +428,7 @@
       renderStatusSection(statusCounts, totalCount);
     }
 
-    // ฟังก์ชันจัดระเบียบประเภทโครงการ: แสดงชื่อครบถ้วน (รองรับ 2 - 3 บรรทัด ไม่ตัดคำทิ้ง)
+    // ฟังก์ชันแสดงผลประเภทโครงการ (รองรับการขึ้นบรรทัดใหม่ได้สูงสุด 3 บรรทัด อย่างเป็นระเบียบ)
     function renderCategorySection(catCounts, totalCount) {
       const listContainer = document.getElementById('category-percentage-list');
       const stackedBar = document.getElementById('stacked-category-bar');
@@ -453,12 +453,12 @@
           <div style="width: ${pct}%; background-color: ${color};" title="${cat}: ${count} โครงการ (${pct}%)"></div>
         `;
 
-        // แสดงชื่อครบถ้วน (ใช้ break-words leading-relaxed และปล่อยให้ขยายบรรทัดอิสระ)
+        // กำหนด line-clamp-3, leading-relaxed และ break-words เพื่อให้แสดงผลได้สูงสุด 3 บรรทัด
         listContainer.innerHTML += `
           <div class="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-[#111928]/90 border border-slate-800/60 hover:border-slate-700/80 transition">
             <div class="flex items-start gap-2.5 min-w-0 flex-1">
               <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1 shadow-sm" style="background-color: ${color}"></span>
-              <span class="text-slate-200 font-medium text-xs leading-relaxed break-words whitespace-normal">${cat}</span>
+              <span class="text-slate-200 font-medium text-xs leading-relaxed break-words line-clamp-3">${cat}</span>
             </div>
             <div class="flex items-center gap-1.5 flex-shrink-0 text-right mt-0.5">
               <span class="font-medium text-slate-300 text-xs">${count} โครงการ</span>
@@ -469,7 +469,7 @@
       });
     }
 
-    // ฟังก์ชันจัดระเบียบสถานะโครงการ
+    // ฟังก์ชันแสดงผลสถานะโครงการ
     function renderStatusSection(statusCounts, totalCount) {
       const labels = Object.keys(statusCounts);
       const values = Object.values(statusCounts);
@@ -507,7 +507,7 @@
           <div class="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-[#111928]/90 border border-slate-800/60 hover:border-slate-700/80 transition">
             <div class="flex items-start gap-2.5 min-w-0 flex-1">
               <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1 shadow-sm" style="background-color: ${color}"></span>
-              <span class="text-slate-200 font-medium text-xs leading-relaxed break-words whitespace-normal">${label}</span>
+              <span class="text-slate-200 font-medium text-xs leading-relaxed break-words line-clamp-2">${label}</span>
             </div>
             <div class="flex items-center gap-1.5 flex-shrink-0 text-right mt-0.5">
               <span class="font-medium text-slate-300 text-xs">${count} โครงการ</span>
