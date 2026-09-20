@@ -102,7 +102,7 @@
     <!-- ส่วนที่ 3: กราฟวิเคราะห์ (Charts Area) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
-      <!-- กราฟที่ 1: เปรียบเทียบงบประมาณรายปี (ปีงบ vs อนุมัติ vs เบิกจ่าย) -->
+      <!-- กราฟที่ 1: เปรียบเทียบงบประมาณรายปี (แผนงบ vs อนุมัติ vs เบิกจ่าย) -->
       <div class="lg:col-span-2 bg-[#151e32] border border-slate-800 rounded-2xl p-5 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
@@ -132,12 +132,12 @@
   </div>
 
   <script>
-    // URL Web App ของคุณ
+    // URL Web App จาก Apps Script ของคุณ
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY5xoZjPQ9uZSr13sT2Z85tgapsNSL6JwunNLXJjINI7_ME6DZLucKGJbAQLB8QWFVRw/exec";
 
     Chart.defaults.font.family = "'Prompt', sans-serif";
 
-    // 1. กำหนดโครงสร้างกราฟเปรียบเทียบรายปี (Grouped Bar Chart)
+    // 1. กราฟแท่งเปรียบเทียบรายปี (Grouped Bar Chart)
     const yearlyCtx = document.getElementById('yearlyComparisonChart').getContext('2d');
     const yearlyChart = new Chart(yearlyCtx, {
       type: 'bar',
@@ -147,19 +147,19 @@
           {
             label: 'งบจัดสรรตามแผน',
             data: [],
-            backgroundColor: '#6366f1', // Indigo
+            backgroundColor: '#6366f1',
             borderRadius: 6
           },
           {
             label: 'งบที่อนุมัติ',
             data: [],
-            backgroundColor: '#10b981', // Emerald
+            backgroundColor: '#10b981',
             borderRadius: 6
           },
           {
             label: 'เบิกจ่ายจริง',
             data: [],
-            backgroundColor: '#f59e0b', // Amber
+            backgroundColor: '#f59e0b',
             borderRadius: 6
           }
         ]
@@ -193,7 +193,7 @@
       }
     });
 
-    // 2. กำหนดโครงสร้างกราฟวงกลมสถานะโครงการ
+    // 2. กราฟวงกลมสถานะโครงการ
     const statusCtx = document.getElementById('statusDoughnutChart').getContext('2d');
     const statusChart = new Chart(statusCtx, {
       type: 'doughnut',
@@ -215,7 +215,7 @@
       }
     });
 
-    // ฟังก์ชันหลัก: ดึงข้อมูลจาก Apps Script
+    // ฟังก์ชันดึงข้อมูลจาก Apps Script
     async function fetchDashboardData() {
       const statusText = document.getElementById('status-text');
       try {
@@ -232,7 +232,6 @@
       } catch (err) {
         console.warn('เชื่อมต่อข้อมูลจริงไม่สำเร็จ กำลังแสดงชุดข้อมูลตัวอย่าง:', err);
         statusText.innerText = "โหมดข้อมูลจำลอง";
-        // ข้อมูลจำลองสำหรับทดสอบพรีวิว
         renderDashboard([
           { fiscalYear: '2568', approvedBudget: 950000, disbursedAmount: 920000, status: 'เสร็จสิ้น' },
           { fiscalYear: '2569', approvedBudget: 45000, disbursedAmount: 15000, status: 'อยู่ระหว่างดำเนินงาน' },
@@ -246,21 +245,20 @@
       }
     }
 
-    // ฟังก์ชันคำนวณและเรนเดอร์แดชบอร์ด
+    // ฟังก์ชันจัดกลุ่มและเรนเดอร์ข้อมูลแดชบอร์ด
     function renderDashboard(projects, fiscalYears) {
-      // 1. รวมรวมปีงบประมาณทั้งหมด (Unique Years) และเรียงลำดับ
+      // รวมปีงบประมาณทั้งหมด (Unique Years)
       const yearsSet = new Set();
       fiscalYears.forEach(fy => yearsSet.add(String(fy.fiscalYear)));
       projects.forEach(p => { if (p.fiscalYear) yearsSet.add(String(p.fiscalYear)); });
       const sortedYears = Array.from(yearsSet).sort();
 
-      // แมปเก็บข้อมูลงบประมาณรายปี
       const yearlyStats = {};
       sortedYears.forEach(y => {
         yearlyStats[y] = { planned: 0, approved: 0, disbursed: 0, count: 0 };
       });
 
-      // ใส่งบจัดสรรจาก FiscalYears
+      // นำงบประมาณตามแผนจากแท็บ FiscalYears มาใส่
       let totalAllPlanned = 0;
       fiscalYears.forEach(fy => {
         const y = String(fy.fiscalYear);
@@ -269,7 +267,7 @@
         totalAllPlanned += val;
       });
 
-      // รวมยอดจากโครงการ (Projects)
+      // รวมยอดจากโครงการ Projects
       let totalAllApproved = 0;
       let totalAllDisbursed = 0;
       let ongoingCount = 0;
@@ -293,7 +291,7 @@
         statusCounts[st] = (statusCounts[st] || 0) + 1;
       });
 
-      // 2. สร้างการ์ดแสดงงบประมาณแต่ละปี (ส่วนที่ 1)
+      // 1. สร้างการ์ดแสดงงบประมาณแต่ละปี
       const cardsContainer = document.getElementById('fiscal-years-cards');
       cardsContainer.innerHTML = '';
 
@@ -327,7 +325,7 @@
         `;
       });
 
-      // 3. สรุปตัวเลข Overall KPI
+      // 2. แสดงตัวเลขในส่วน KPI รวม
       document.getElementById('kpi-total-projects').innerText = projects.length.toLocaleString();
       document.getElementById('kpi-ongoing-count').innerText = `กำลังดำเนินงาน ${ongoingCount} โครงการ`;
       document.getElementById('kpi-total-budget').innerText = '฿' + totalAllPlanned.toLocaleString();
@@ -339,14 +337,14 @@
       document.getElementById('kpi-approved-percent').innerText = `${totalAppRate}% ของงบจัดสรรทั้งหมด`;
       document.getElementById('kpi-disbursed-percent').innerText = `เบิกจ่ายแล้ว ${totalDisRate}% ของงบอนุมัติ`;
 
-      // 4. อัปเดตกราฟแท่งเปรียบเทียบรายปี
+      // 3. อัปเดตกราฟแท่งเปรียบเทียบรายปี
       yearlyChart.data.labels = sortedYears.map(y => `ปี ${y}`);
       yearlyChart.data.datasets[0].data = sortedYears.map(y => yearlyStats[y].planned);
       yearlyChart.data.datasets[1].data = sortedYears.map(y => yearlyStats[y].approved);
       yearlyChart.data.datasets[2].data = sortedYears.map(y => yearlyStats[y].disbursed);
       yearlyChart.update();
 
-      // 5. อัปเดตกราฟวงกลมสถานะโครงการ
+      // 4. อัปเดตกราฟวงกลมสถานะโครงการ
       const statusLabels = Object.keys(statusCounts);
       const statusValues = Object.values(statusCounts);
       if (statusLabels.length > 0) {
