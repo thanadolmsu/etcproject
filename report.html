@@ -112,7 +112,7 @@
       </div>
     </div>
 
-    <!-- ส่วนที่ 4: สัดส่วนประเภท (รองรับ 3 บรรทัด) และ สัดส่วนสถานะโครงการ -->
+    <!-- ส่วนที่ 4: สัดส่วนประเภท และ สัดส่วนสถานะโครงการ -->
     <div class="bg-[#151e32] border border-slate-800 rounded-2xl p-5 shadow-sm space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
@@ -130,7 +130,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         
-        <!-- 4.1 สัดส่วนประเภทโครงการ (จัดวางในกล่องเข้ม รองรับชื่อยาวได้ถึง 3 บรรทัด) -->
+        <!-- 4.1 สัดส่วนประเภทโครงการ (Category) -->
         <div class="bg-[#090e1a] border border-slate-800/90 rounded-2xl p-5 flex flex-col justify-between shadow-inner">
           <div>
             <div class="flex items-center justify-between">
@@ -155,7 +155,7 @@
           </div>
         </div>
 
-        <!-- 4.2 สัดส่วนสถานะโครงการ (Status Breakdown) -->
+        <!-- 4.2 สัดส่วนสถานะโครงการ (Status) ปรับสียกเลิกโครงการเป็นสีเทา -->
         <div class="bg-[#090e1a] border border-slate-800/90 rounded-2xl p-5 flex flex-col justify-between shadow-inner">
           <div>
             <div class="flex items-center justify-between">
@@ -224,7 +224,7 @@
       }
     });
 
-    // 2. กราฟวงกลมสถานะโครงการ (Status)
+    // 2. กราฟวงกลมสถานะโครงการ
     const statusCtx = document.getElementById('statusDoughnutChart').getContext('2d');
     const statusChart = new Chart(statusCtx, {
       type: 'doughnut',
@@ -232,7 +232,7 @@
         labels: [],
         datasets: [{
           data: [],
-          backgroundColor: ['#34d399', '#fbbf24', '#38bdf8', '#f87171', '#c084fc'],
+          backgroundColor: [],
           borderWidth: 0
         }]
       },
@@ -255,6 +255,16 @@
         cutout: '68%'
       }
     });
+
+    // กำหนดแมปสีตามชื่อสถานะโครงการโดยตรง (ยกเลิกโครงการ = สีเทา)
+    function getStatusColor(statusName) {
+      const name = (statusName || '').trim();
+      if (name.includes('เสร็จสิ้น')) return '#10b981';            // เขียว
+      if (name.includes('ดำเนินงาน')) return '#fbbf24';            // ส้ม/เหลือง
+      if (name.includes('อนุมัติ')) return '#38bdf8';             // ฟ้า
+      if (name.includes('ยกเลิก')) return '#64748b';              // สีเทา Slate (ยกเลิกโครงการ)
+      return '#a78bfa';                                           // ม่วง (สถานะอื่นๆ)
+    }
 
     // ดึงข้อมูลจาก Apps Script
     async function fetchDashboardData() {
@@ -280,8 +290,8 @@
           { fiscalYear: '2568', category: 'โครงการวิจัยและพัฒนานวัตกรรมทางการศึกษาและเทคโนโลยีสารสนเทศเพื่ออนาคต', approvedBudget: 500000, disbursedAmount: 470000, status: 'เสร็จสิ้น' },
           { fiscalYear: '2569', category: 'โครงการบริการวิชาการแก่สังคมและชุมชนเพื่อการยกระดับคุณภาพชีวิตอย่างยั่งยืน', approvedBudget: 45000, disbursedAmount: 15000, status: 'อยู่ระหว่างดำเนินงาน' },
           { fiscalYear: '2569', category: 'โครงการวิจัยและพัฒนานวัตกรรมทางการศึกษาและเทคโนโลยีสารสนเทศเพื่ออนาคต', approvedBudget: 80000, disbursedAmount: 30000, status: 'อยู่ระหว่างดำเนินงาน' },
-          { fiscalYear: '2569', category: 'โครงการพัฒนาและปรับปรุงกระบวนการเรียนการสอนแบบผสมผสานยุคดิจิทัล', approvedBudget: 25000, disbursedAmount: 5000, status: 'อยู่ระหว่างดำเนินงาน' },
-          { fiscalYear: '2569', category: 'โครงการทำนุบำรุงศิลปวัฒนธรรมและอนุรักษ์สืบสานภูมิปัญญาท้องถิ่นอีสาน', approvedBudget: 15000, disbursedAmount: 0, status: 'อนุมัติโครงการ' },
+          { fiscalYear: '2569', category: 'โครงการพัฒนาและปรับปรุงกระบวนการเรียนการสอนแบบผสมผสานยุคดิจิทัล', approvedBudget: 25000, disbursedAmount: 5000, status: 'อนุมัติโครงการ' },
+          { fiscalYear: '2569', category: 'โครงการทำนุบำรุงศิลปวัฒนธรรมและอนุรักษ์สืบสานภูมิปัญญาท้องถิ่นอีสาน', approvedBudget: 15000, disbursedAmount: 0, status: 'ยกเลิกโครงการ' },
           { fiscalYear: '2570', category: 'โครงการวิจัยและพัฒนานวัตกรรมทางการศึกษาและเทคโนโลยีสารสนเทศเพื่ออนาคต', approvedBudget: 0, disbursedAmount: 0, status: 'อนุมัติโครงการ' }
         ];
         globalFiscalYears = [
@@ -428,7 +438,7 @@
       renderStatusSection(statusCounts, totalCount);
     }
 
-    // ฟังก์ชันแสดงผลประเภทโครงการ (รองรับการขึ้นบรรทัดใหม่ได้สูงสุด 3 บรรทัด อย่างเป็นระเบียบ)
+    // ฟังก์ชันแสดงผลประเภทโครงการ (รองรับ 3 บรรทัด)
     function renderCategorySection(catCounts, totalCount) {
       const listContainer = document.getElementById('category-percentage-list');
       const stackedBar = document.getElementById('stacked-category-bar');
@@ -453,7 +463,6 @@
           <div style="width: ${pct}%; background-color: ${color};" title="${cat}: ${count} โครงการ (${pct}%)"></div>
         `;
 
-        // กำหนด line-clamp-3, leading-relaxed และ break-words เพื่อให้แสดงผลได้สูงสุด 3 บรรทัด
         listContainer.innerHTML += `
           <div class="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-[#111928]/90 border border-slate-800/60 hover:border-slate-700/80 transition">
             <div class="flex items-start gap-2.5 min-w-0 flex-1">
@@ -469,14 +478,12 @@
       });
     }
 
-    // ฟังก์ชันแสดงผลสถานะโครงการ
+    // ฟังก์ชันแสดงผลสถานะโครงการ (ใช้ getStatusColor() กำหนดสีเทาให้ยกเลิกโครงการ)
     function renderStatusSection(statusCounts, totalCount) {
       const labels = Object.keys(statusCounts);
       const values = Object.values(statusCounts);
       const listContainer = document.getElementById('status-percentage-list');
       listContainer.innerHTML = '';
-
-      const palette = ['#34d399', '#fbbf24', '#38bdf8', '#f87171', '#c084fc'];
 
       if (labels.length === 0 || totalCount === 0) {
         statusChart.data.labels = ['ไม่มีข้อมูล'];
@@ -493,15 +500,22 @@
         return `${label} (${pct}%)`;
       });
 
+      // แมปสีตามเงื่อนไขของสถานะแต่ละรายการ
+      const statusColors = labels.map(label => getStatusColor(label));
+
       statusChart.data.labels = labelsWithPercent;
       statusChart.data.datasets[0].data = values;
-      statusChart.data.datasets[0].backgroundColor = palette.slice(0, labels.length);
+      statusChart.data.datasets[0].backgroundColor = statusColors;
       statusChart.update();
 
       labels.forEach((label, idx) => {
         const count = values[idx];
         const pct = totalCount > 0 ? ((count / totalCount) * 100).toFixed(1) : 0;
-        const color = palette[idx % palette.length];
+        const color = statusColors[idx];
+
+        // กำหนดสีตัวอักษรเปอร์เซ็นต์ (ถ้ายกเลิกใช้สีเทา slate-400 ถ้าอื่นใช้ emerald-400)
+        const isCanceled = label.includes('ยกเลิก');
+        const textPctClass = isCanceled ? 'text-slate-400' : 'text-emerald-400';
 
         listContainer.innerHTML += `
           <div class="flex items-start justify-between gap-3 p-2.5 rounded-lg bg-[#111928]/90 border border-slate-800/60 hover:border-slate-700/80 transition">
@@ -511,7 +525,7 @@
             </div>
             <div class="flex items-center gap-1.5 flex-shrink-0 text-right mt-0.5">
               <span class="font-medium text-slate-300 text-xs">${count} โครงการ</span>
-              <span class="text-emerald-400 font-bold text-xs w-12 text-right">(${pct}%)</span>
+              <span class="${textPctClass} font-bold text-xs w-12 text-right">(${pct}%)</span>
             </div>
           </div>
         `;
