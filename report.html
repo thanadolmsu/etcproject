@@ -112,7 +112,7 @@
       </div>
     </div>
 
-    <!-- ส่วนที่ 4: สัดส่วนประเภท (Progress Bars รูปแบบที่ 1) และสถานะโครงการ -->
+    <!-- ส่วนที่ 4: สัดส่วนประเภท และ สัดส่วนสถานะโครงการ จัดระเบียบให้สอดคล้องกัน -->
     <div class="bg-[#151e32] border border-slate-800 rounded-2xl p-5 shadow-sm space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
@@ -128,38 +128,47 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         
-        <!-- 4.1 สัดส่วนประเภทโครงการ (รูปแบบที่ 1: Horizontal Progress List) -->
+        <!-- 4.1 สัดส่วนประเภทโครงการ (Category Breakdown จัดระเบียบเรียบร้อย) -->
         <div class="bg-[#0b1120]/60 border border-slate-800/80 rounded-xl p-5 flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between">
-              <h4 class="text-sm font-semibold text-slate-200">สัดส่วนประเภทโครงการ (Category Breakdown)</h4>
-              <span id="cat-total-badge" class="text-xs text-indigo-400 font-semibold bg-indigo-500/10 px-2 py-0.5 rounded">0 โครงการ</span>
+              <h4 class="text-sm font-semibold text-slate-200">สัดส่วนประเภทโครงการ (Category)</h4>
+              <span id="cat-total-badge" class="text-xs text-indigo-400 font-semibold bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">0 โครงการ</span>
             </div>
-            <p class="text-xs text-slate-400 mt-0.5 mb-3">จำแนกตามพันธกิจ พร้อมแถบสัดส่วนรวม 100%</p>
+            <p class="text-xs text-slate-400 mt-1 mb-4">จำแนกตามพันธกิจพร้อมสัดส่วนร้อยละ</p>
 
-            <!-- แถบหลอดสีรวม 100% (Single Stacked Bar) -->
-            <div id="stacked-category-bar" class="w-full h-3 rounded-full overflow-hidden flex bg-slate-800 mb-5"></div>
+            <!-- แถบหลอดสีรวม 100% ด้านบน -->
+            <div class="space-y-1.5 mb-5">
+              <div class="flex justify-between text-[11px] text-slate-400">
+                <span>แถบแสดงสัดส่วนรวม</span>
+                <span>100%</span>
+              </div>
+              <div id="stacked-category-bar" class="w-full h-3 rounded-full overflow-hidden flex bg-slate-800 shadow-inner"></div>
+            </div>
           </div>
 
-          <!-- รายการแถบความคืบหน้ารายประเภท -->
-          <div id="category-progress-list" class="space-y-4"></div>
+          <!-- รายการสรุปประเภทโครงการ จัดตารางตรงกับสถานะโครงการ -->
+          <div id="category-percentage-list" class="space-y-2 border-t border-slate-800/80 pt-4 text-xs"></div>
         </div>
 
-        <!-- 4.2 สัดส่วนสถานะโครงการ (Status Doughnut Chart) -->
+        <!-- 4.2 สัดส่วนสถานะโครงการ (Status Breakdown) -->
         <div class="bg-[#0b1120]/60 border border-slate-800/80 rounded-xl p-5 flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between">
               <h4 class="text-sm font-semibold text-slate-200">สัดส่วนสถานะโครงการ (Status)</h4>
-              <span id="status-total-badge" class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded">0 โครงการ</span>
+              <span id="status-total-badge" class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">0 โครงการ</span>
             </div>
-            <p class="text-xs text-slate-400 mt-0.5">จำแนกตามความคืบหน้าการดำเนินงาน</p>
+            <p class="text-xs text-slate-400 mt-1">จำแนกตามความคืบหน้าการดำเนินงาน</p>
           </div>
-          <div class="h-60 flex items-center justify-center my-3">
+
+          <div class="h-48 flex items-center justify-center my-3">
             <canvas id="statusDoughnutChart"></canvas>
           </div>
-          <div id="status-percentage-list" class="space-y-1 text-xs border-t border-slate-800 pt-3"></div>
+
+          <!-- รายการสรุปสถานะโครงการ -->
+          <div id="status-percentage-list" class="space-y-2 border-t border-slate-800/80 pt-4 text-xs"></div>
         </div>
 
       </div>
@@ -227,7 +236,7 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom', labels: { color: '#cbd5e1', boxWidth: 12, padding: 8, font: { size: 11 } } },
+          legend: { position: 'bottom', labels: { color: '#cbd5e1', boxWidth: 10, padding: 8, font: { size: 11 } } },
           tooltip: {
             callbacks: {
               label: function(context) {
@@ -287,7 +296,6 @@
       globalProjects.forEach(p => { if (p.fiscalYear) yearsSet.add(String(p.fiscalYear)); });
       const sortedYears = Array.from(yearsSet).sort();
 
-      // เติม Dropdown ตัวเลือกปี
       const selectElem = document.getElementById('yearFilterSelect');
       const currentSelected = selectElem.value;
       selectElem.innerHTML = '<option value="ALL">ทุกปีงบประมาณ (ภาพรวม)</option>';
@@ -298,7 +306,6 @@
         selectElem.value = currentSelected;
       }
 
-      // คำนวณงบประมาณรายปี
       const yearlyStats = {};
       sortedYears.forEach(y => {
         yearlyStats[y] = { planned: 0, approved: 0, disbursed: 0, count: 0 };
@@ -385,17 +392,15 @@
       yearlyChart.data.datasets[2].data = sortedYears.map(y => yearlyStats[y].disbursed);
       yearlyChart.update();
 
-      // แสดงสัดส่วนประเภทและสถานะ
       updateYearBreakdowns(selectElem.value);
     }
 
-    // ฟังก์ชันเมื่อเปลี่ยนตัวกรองปี
     function onYearFilterChange() {
       const selectedYear = document.getElementById('yearFilterSelect').value;
       updateYearBreakdowns(selectedYear);
     }
 
-    // ฟังก์ชันคำนวณและอัปเดตสัดส่วน Category และ Status
+    // ฟังก์ชันคำนวณและอัปเดตสัดส่วน Category และ Status ให้มีโครงสร้างเรียบร้อยตรงกัน
     function updateYearBreakdowns(selectedYear) {
       let filteredProjects = globalProjects;
       if (selectedYear !== 'ALL') {
@@ -406,85 +411,68 @@
       document.getElementById('cat-total-badge').innerText = `${totalCount} โครงการ`;
       document.getElementById('status-total-badge').innerText = `${totalCount} โครงการ`;
 
-      // รวมสถิติประเภท (นับจำนวนและงบประมาณ)
-      const catStats = {};
-      // รวมสถิติสถานะ
+      const catCounts = {};
       const statusCounts = {};
 
       filteredProjects.forEach(p => {
         const cat = (p.category || 'ไม่ระบุประเภท').trim();
         const st = (p.status || 'อนุมัติโครงการ').trim();
-        const budget = parseFloat(p.approvedBudget || 0);
 
-        if (!catStats[cat]) {
-          catStats[cat] = { count: 0, budget: 0 };
-        }
-        catStats[cat].count += 1;
-        catStats[cat].budget += budget;
-
+        catCounts[cat] = (catCounts[cat] || 0) + 1;
         statusCounts[st] = (statusCounts[st] || 0) + 1;
       });
 
-      // 1. วาดรูปแบบที่ 1: Horizontal Progress List สำหรับ Category
-      renderCategoryProgressBars(catStats, totalCount);
+      // 1. เรนเดอร์สัดส่วนประเภทโครงการ (Category) แบบเป็นระเบียบ
+      renderCategorySection(catCounts, totalCount);
 
-      // 2. วาดกราฟวงกลมสถานะ (Status Doughnut)
-      renderStatusDoughnut(statusCounts, totalCount);
+      // 2. เรนเดอร์สัดส่วนสถานะโครงการ (Status)
+      renderStatusSection(statusCounts, totalCount);
     }
 
-    // ฟังก์ชันสร้าง Progress Bars รายการประเภท (รูปแบบที่ 1)
-    function renderCategoryProgressBars(catStats, totalCount) {
-      const listContainer = document.getElementById('category-progress-list');
+    // ฟังก์ชันจัดระเบียบสัดส่วนประเภทโครงการ (ใช้ตารางรายการระเบียบเดียวกับสถานะ)
+    function renderCategorySection(catCounts, totalCount) {
+      const listContainer = document.getElementById('category-percentage-list');
       const stackedBar = document.getElementById('stacked-category-bar');
       listContainer.innerHTML = '';
       stackedBar.innerHTML = '';
 
-      const labels = Object.keys(catStats);
+      const labels = Object.keys(catCounts);
       if (labels.length === 0 || totalCount === 0) {
-        stackedBar.innerHTML = '<div class="w-full bg-slate-700 h-full"></div>';
-        listContainer.innerHTML = '<p class="text-slate-500 text-center py-4 text-xs">ไม่มีข้อมูลโครงการในปีงบประมาณนี้</p>';
+        stackedBar.innerHTML = '<div class="w-full bg-slate-800 h-full"></div>';
+        listContainer.innerHTML = '<p class="text-slate-500 text-center py-4 text-xs">ไม่มีข้อมูลโครงการในปีนี้</p>';
         return;
       }
 
       const palette = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
 
       labels.forEach((cat, idx) => {
-        const item = catStats[cat];
-        const pct = totalCount > 0 ? ((item.count / totalCount) * 100).toFixed(1) : 0;
+        const count = catCounts[cat];
+        const pct = totalCount > 0 ? ((count / totalCount) * 100).toFixed(1) : 0;
         const color = palette[idx % palette.length];
 
-        // เติมแถบสีในหลอดรวม 100%
+        // เติมส่วนในหลอดสีรวม 100%
         stackedBar.innerHTML += `
-          <div style="width: ${pct}%; background-color: ${color};" title="${cat}: ${item.count} โครงการ (${pct}%)"></div>
+          <div style="width: ${pct}%; background-color: ${color};" title="${cat}: ${count} โครงการ (${pct}%)"></div>
         `;
 
-        // เติมแถบความคืบหน้ารายประเภท
+        // เติมแถวรายการข้อมูล: จัดวางชื่อชิดซ้าย และตัวเลข/เปอร์เซ็นต์ชิดขวาอย่างเป็นระเบียบ
         listContainer.innerHTML += `
-          <div>
-            <div class="flex justify-between items-center text-xs mb-1">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${color}"></span>
-                <span class="font-medium text-slate-200 truncate max-w-[180px] sm:max-w-none">${cat}</span>
-              </div>
-              <div class="font-semibold text-slate-300">
-                <span>${item.count} โครงการ</span>
-                <span class="text-indigo-400 ml-1 font-bold">(${pct}%)</span>
-              </div>
+          <div class="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-800/40 transition">
+            <div class="flex items-center gap-2.5 min-w-0 pr-3">
+              <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm" style="background-color: ${color}"></span>
+              <span class="text-slate-300 font-medium truncate">${cat}</span>
             </div>
-            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-              <div class="h-2 rounded-full transition-all duration-500" style="width: ${pct}%; background-color: ${color}"></div>
-            </div>
-            <div class="flex justify-between text-[11px] text-slate-400 mt-1">
-              <span>งบอนุมัติรวม:</span>
-              <span class="text-slate-300 font-medium">฿${item.budget.toLocaleString()} บาท</span>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="font-medium text-slate-200">${count} โครงการ</span>
+              <span class="text-indigo-400 font-semibold w-14 text-right">(${pct}%)</span>
             </div>
           </div>
         `;
       });
     }
 
-    // ฟังก์ชันวาดกราฟวงกลมสถานะโครงการ
-    function renderStatusDoughnut(statusCounts, totalCount) {
+    // ฟังก์ชันจัดระเบียบสัดส่วนสถานะโครงการ
+    function renderStatusSection(statusCounts, totalCount) {
       const labels = Object.keys(statusCounts);
       const values = Object.values(statusCounts);
       const listContainer = document.getElementById('status-percentage-list');
@@ -518,14 +506,14 @@
         const color = palette[idx % palette.length];
 
         listContainer.innerHTML += `
-          <div class="flex items-center justify-between py-1">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${color}"></span>
-              <span class="text-slate-300">${label}</span>
+          <div class="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-800/40 transition">
+            <div class="flex items-center gap-2.5 min-w-0 pr-3">
+              <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm" style="background-color: ${color}"></span>
+              <span class="text-slate-300 font-medium truncate">${label}</span>
             </div>
-            <div class="font-medium text-slate-200">
-              <span>${count} โครงการ</span>
-              <span class="text-slate-400 ml-1 font-semibold">(${pct}%)</span>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="font-medium text-slate-200">${count} โครงการ</span>
+              <span class="text-emerald-400 font-semibold w-14 text-right">(${pct}%)</span>
             </div>
           </div>
         `;
