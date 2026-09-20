@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Report</title>
+  <!-- Tailwind CSS & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="bg-[#0b1120] text-slate-100 p-4 md:p-6 min-h-screen">
+
+  <!-- Header -->
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight">Analytics Report</h1>
+      <p class="text-sm text-slate-400">ภาพรวมข้อมูลและการใช้งานระบบ</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded-full font-medium">● เชื่อมต่อสำเร็จ</span>
+      <button onclick="fetchData()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-1.5 rounded-lg transition shadow-sm">รีเฟรช</button>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-[#151e32] border border-slate-800 rounded-xl p-4">
+      <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Revenue</p>
+      <div class="flex items-baseline justify-between mt-2">
+        <h3 id="val-revenue" class="text-2xl font-bold text-white">$142,500</h3>
+        <span class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded">+18.2%</span>
+      </div>
+    </div>
+    <div class="bg-[#151e32] border border-slate-800 rounded-xl p-4">
+      <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Active Users</p>
+      <div class="flex items-baseline justify-between mt-2">
+        <h3 id="val-users" class="text-2xl font-bold text-white">24,850</h3>
+        <span class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded">+7.4%</span>
+      </div>
+    </div>
+    <div class="bg-[#151e32] border border-slate-800 rounded-xl p-4">
+      <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">New Signups</p>
+      <div class="flex items-baseline justify-between mt-2">
+        <h3 id="val-signups" class="text-2xl font-bold text-white">1,632</h3>
+        <span class="text-xs text-indigo-400 font-semibold bg-indigo-500/10 px-2 py-0.5 rounded">+12.1%</span>
+      </div>
+    </div>
+    <div class="bg-[#151e32] border border-slate-800 rounded-xl p-4">
+      <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Bounce Rate</p>
+      <div class="flex items-baseline justify-between mt-2">
+        <h3 id="val-bounce" class="text-2xl font-bold text-white">38.5%</h3>
+        <span class="text-xs text-amber-400 font-semibold bg-amber-500/10 px-2 py-0.5 rounded">-3.6%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+    <div class="lg:col-span-2 bg-[#151e32] border border-slate-800 rounded-xl p-5">
+      <h4 class="text-sm font-semibold mb-4 text-slate-200">Revenue Growth Trend</h4>
+      <div class="h-64">
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+    <div class="bg-[#151e32] border border-slate-800 rounded-xl p-5">
+      <h4 class="text-sm font-semibold mb-4 text-slate-200">Traffic Sources</h4>
+      <div class="h-64 flex items-center justify-center">
+        <canvas id="doughnutChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="bg-[#151e32] border border-slate-800 rounded-xl p-5 overflow-x-auto">
+    <h4 class="text-sm font-semibold mb-4 text-slate-200">Recent Activity Logs</h4>
+    <table class="w-full text-left text-sm text-slate-300">
+      <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
+        <tr>
+          <th class="pb-3">User</th>
+          <th class="pb-3">Event Type</th>
+          <th class="pb-3">Details</th>
+          <th class="pb-3 text-right">Status</th>
+        </tr>
+      </thead>
+      <tbody id="logs-tbody" class="divide-y divide-slate-800/60 font-medium text-xs md:text-sm">
+        <tr>
+          <td class="py-3">Alex R.</td>
+          <td class="py-3 text-indigo-400">Login</td>
+          <td class="py-3 text-slate-400">Authenticated via SSO</td>
+          <td class="py-3 text-right"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded">Active</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY5xoZjPQ9uZSr13sT2Z85tgapsNSL6JwunNLXJjINI7_ME6DZLucKGJbAQLB8QWFVRw/exec";
+
+    // กำหนดกราฟเบื้องต้น
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    const barChart = new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+        datasets: [{
+          label: 'Revenue ($)',
+          data: [5000, 7500, 6000, 9000, 14000, 11000, 8500, 13000, 15000, 18000],
+          backgroundColor: '#6366f1',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+          y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
+        }
+      }
+    });
+
+    const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+    const doughnutChart = new Chart(doughnutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Direct', 'Referral', 'Social', 'Organic'],
+        datasets: [{
+          data: [40, 25, 18, 17],
+          backgroundColor: ['#6366f1', '#06b6d4', '#10b981', '#f59e0b'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } }
+        }
+      }
+    });
+
+    // ฟังก์ชันดึงข้อมูลจริงจาก Apps Script
+    async function fetchData() {
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        
+        // อัปเดตตัวเลข
+        if (data.revenue) document.getElementById('val-revenue').innerText = `$${Number(data.revenue).toLocaleString()}`;
+        if (data.activeUsers) document.getElementById('val-users').innerText = Number(data.activeUsers).toLocaleString();
+        if (data.newSignups) document.getElementById('val-signups').innerText = Number(data.newSignups).toLocaleString();
+        if (data.bounceRate) document.getElementById('val-bounce').innerText = data.bounceRate;
+
+        // อัปเดตกราฟ
+        if (data.revenueData) {
+          barChart.data.datasets[0].data = data.revenueData;
+          barChart.update();
+        }
+      } catch (err) {
+        console.warn('กำลังแสดงข้อมูลตัวอย่าง (ตรวจสอบสิทธิ์ CORS หรือการ Deploy ของ Apps Script)', err);
+      }
+    }
+
+    // เรียกดึงข้อมูลเมื่อโหลดหน้าเว็บ
+    window.addEventListener('DOMContentLoaded', fetchData);
+  </script>
+</body>
+</html>
