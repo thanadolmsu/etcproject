@@ -124,9 +124,7 @@
         <div class="h-64 flex items-center justify-center my-auto">
           <canvas id="statusDoughnutChart"></canvas>
         </div>
-        <div id="status-percentage-list" class="mt-2 pt-3 border-t border-slate-800/80 space-y-1 text-xs">
-          <!-- แสดงสรุปรายการสถานะพร้อม % ด้านล่างกราฟ -->
-        </div>
+        <div id="status-percentage-list" class="mt-2 pt-3 border-t border-slate-800/80 space-y-1 text-xs"></div>
       </div>
 
     </div>
@@ -137,7 +135,7 @@
 
     Chart.defaults.font.family = "'Prompt', sans-serif";
 
-    // กราฟแท่งเปรียบเทียบรายปี
+    // 1. กราฟแท่งเปรียบเทียบรายปี
     const yearlyCtx = document.getElementById('yearlyComparisonChart').getContext('2d');
     const yearlyChart = new Chart(yearlyCtx, {
       type: 'bar',
@@ -173,7 +171,7 @@
       }
     });
 
-    // กราฟวงกลมสถานะโครงการ พร้อมคำนวณ % ใน Tooltip และ Legend
+    // 2. กราฟวงกลมสถานะโครงการ
     const statusCtx = document.getElementById('statusDoughnutChart').getContext('2d');
     const statusChart = new Chart(statusCtx, {
       type: 'doughnut',
@@ -208,6 +206,7 @@
       }
     });
 
+    // 3. ฟังก์ชันดึงข้อมูลจาก Google Apps Script
     async function fetchDashboardData() {
       const statusText = document.getElementById('status-text');
       try {
@@ -237,6 +236,7 @@
       }
     }
 
+    // 4. ฟังก์ชันคำนวณและเรนเดอร์แดชบอร์ด
     function renderDashboard(projects, fiscalYears) {
       const yearsSet = new Set();
       fiscalYears.forEach(fy => yearsSet.add(String(fy.fiscalYear)));
@@ -279,7 +279,7 @@
         statusCounts[st] = (statusCounts[st] || 0) + 1;
       });
 
-      // 1. การ์ดแยกปี
+      // สรุปการ์ดรายปี
       const cardsContainer = document.getElementById('fiscal-years-cards');
       cardsContainer.innerHTML = '';
       sortedYears.forEach(year => {
@@ -312,7 +312,7 @@
         `;
       });
 
-      // 2. ข้อมูลภาพรวม KPI
+      // สรุป KPI รวม
       document.getElementById('kpi-total-projects').innerText = projects.length.toLocaleString();
       document.getElementById('kpi-ongoing-count').innerText = `กำลังดำเนินงาน ${ongoingCount} โครงการ`;
       document.getElementById('kpi-total-budget').innerText = '฿' + totalAllPlanned.toLocaleString();
@@ -324,20 +324,19 @@
       document.getElementById('kpi-approved-percent').innerText = `${totalAppRate}% ของงบจัดสรรทั้งหมด`;
       document.getElementById('kpi-disbursed-percent').innerText = `เบิกจ่ายแล้ว ${totalDisRate}% ของงบอนุมัติ`;
 
-      // 3. อัปเดตกราฟแท่งรายปี
+      // อัปเดตกราฟแท่งรายปี
       yearlyChart.data.labels = sortedYears.map(y => `ปี ${y}`);
       yearlyChart.data.datasets[0].data = sortedYears.map(y => yearlyStats[y].planned);
       yearlyChart.data.datasets[1].data = sortedYears.map(y => yearlyStats[y].approved);
       yearlyChart.data.datasets[2].data = sortedYears.map(y => yearlyStats[y].disbursed);
       yearlyChart.update();
 
-      // 4. คำนวณเปอร์เซ็นต์สถานะโครงการสำหรับกราฟวงกลม
+      // อัปเดตกราฟวงกลมและคำนวณ %
       const rawLabels = Object.keys(statusCounts);
       const rawValues = Object.values(statusCounts);
       const totalProjectsCount = projects.length;
 
       if (rawLabels.length > 0) {
-        // เพิ่ม % กำกับใน Label ของกราฟโดยตรง เช่น "อนุมัติโครงการ (25.0%)"
         const labelsWithPercent = rawLabels.map((label, idx) => {
           const count = rawValues[idx];
           const pct = totalProjectsCount > 0 ? ((count / totalProjectsCount) * 100).toFixed(1) : 0;
@@ -348,7 +347,6 @@
         statusChart.data.datasets[0].data = rawValues;
         statusChart.update();
 
-        // แสดงรายการสรุปด้านล่างวงกลมแบบมีแถบสีระบุชัดเจน
         const colors = ['#38bdf8', '#fbbf24', '#34d399', '#f87171', '#a78bfa'];
         const listContainer = document.getElementById('status-percentage-list');
         listContainer.innerHTML = '';
