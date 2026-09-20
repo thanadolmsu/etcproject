@@ -18,9 +18,9 @@
     }
   </style>
 </head>
-<body class="bg-[#0b1120] text-slate-100 p-4 md:p-6 min-h-screen">
+<body class="bg-[#0b1120] text-slate-100 p-4 md:p-6 min-h-screen flex flex-col justify-start">
 
-  <div class="max-w-7xl mx-auto">
+  <div class="max-w-7xl w-full mx-auto">
     <!-- ส่วนหัว (Header) -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
       <div>
@@ -90,14 +90,14 @@
     </div>
 
     <!-- ส่วนกราฟ (Charts Row) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- กราฟแท่ง: แนวโน้มรายได้ -->
       <div class="lg:col-span-2 bg-[#151e32] border border-slate-800/80 rounded-2xl p-5 shadow-sm">
         <div class="flex items-center justify-between mb-4">
           <h4 class="text-base font-semibold text-slate-200">แนวโน้มรายได้รายเดือน</h4>
           <span class="text-xs text-slate-400">หน่วย: บาท (THB)</span>
         </div>
-        <div class="h-64 sm:h-72">
+        <div class="h-72 sm:h-80">
           <canvas id="barChart"></canvas>
         </div>
       </div>
@@ -105,55 +105,10 @@
       <!-- กราฟวงกลม: สัดส่วนช่องทางผู้เข้าชม -->
       <div class="bg-[#151e32] border border-slate-800/80 rounded-2xl p-5 shadow-sm">
         <h4 class="text-base font-semibold text-slate-200 mb-4">ช่องทางการเข้าชม</h4>
-        <div class="h-64 sm:h-72 flex items-center justify-center">
+        <div class="h-72 sm:h-80 flex items-center justify-center">
           <canvas id="doughnutChart"></canvas>
         </div>
       </div>
-    </div>
-
-    <!-- ตารางบันทึกกิจกรรมล่าสุด (Data Table) -->
-    <div class="bg-[#151e32] border border-slate-800/80 rounded-2xl p-5 shadow-sm overflow-x-auto">
-      <h4 class="text-base font-semibold text-slate-200 mb-4">ประวัติกิจกรรมล่าสุด</h4>
-      <table class="w-full text-left text-sm text-slate-300">
-        <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
-          <tr>
-            <th class="pb-3 font-semibold">ชื่อผู้ใช้</th>
-            <th class="pb-3 font-semibold">ประเภทกิจกรรม</th>
-            <th class="pb-3 font-semibold">รายละเอียด</th>
-            <th class="pb-3 font-semibold">เวลา</th>
-            <th class="pb-3 font-semibold text-right">สถานะ</th>
-          </tr>
-        </thead>
-        <tbody id="logs-tbody" class="divide-y divide-slate-800/60 font-normal">
-          <tr>
-            <td class="py-3 font-medium text-white">สมชาย มั่งคั่ง</td>
-            <td class="py-3 text-indigo-400">เข้าสู่ระบบ</td>
-            <td class="py-3 text-slate-400">ยืนยันตัวตนสำเร็จ</td>
-            <td class="py-3 text-slate-400 text-xs">20 ก.ย. 2026, 11:30 น.</td>
-            <td class="py-3 text-right">
-              <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-xs">สำเร็จ</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="py-3 font-medium text-white">วิภาวรรณ สดใส</td>
-            <td class="py-3 text-cyan-400">ชำระเงิน</td>
-            <td class="py-3 text-slate-400">อัปเกรดแพ็กเกจรายปี</td>
-            <td class="py-3 text-slate-400 text-xs">20 ก.ย. 2026, 10:45 น.</td>
-            <td class="py-3 text-right">
-              <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-xs">เสร็จสิ้น</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="py-3 font-medium text-white">กิตติศักดิ์ พงศ์พานิช</td>
-            <td class="py-3 text-amber-400">ส่งคำขอรับบริการ</td>
-            <td class="py-3 text-slate-400">แจ้งปัญหาการใช้งาน</td>
-            <td class="py-3 text-slate-400 text-xs">20 ก.ย. 2026, 09:12 น.</td>
-            <td class="py-3 text-right">
-              <span class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded text-xs">รอดำเนินการ</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   </div>
 
@@ -247,23 +202,10 @@
           barChart.update();
         }
 
-        // อัปเดตตาราง (หากมีการส่ง logs เข้ามา)
-        if (data.logs && Array.isArray(data.logs)) {
-          const tbody = document.getElementById('logs-tbody');
-          tbody.innerHTML = '';
-          data.logs.forEach(item => {
-            tbody.innerHTML += `
-              <tr>
-                <td class="py-3 font-medium text-white">${item.user || '-'}</td>
-                <td class="py-3 text-indigo-400">${item.event || '-'}</td>
-                <td class="py-3 text-slate-400">${item.details || '-'}</td>
-                <td class="py-3 text-slate-400 text-xs">${item.time || '-'}</td>
-                <td class="py-3 text-right">
-                  <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-xs">${item.status || 'สำเร็จ'}</span>
-                </td>
-              </tr>
-            `;
-          });
+        // อัปเดตกราฟวงกลม (ถ้ามีส่งมา)
+        if (data.trafficSource && data.trafficSource.length > 0) {
+          doughnutChart.data.datasets[0].data = data.trafficSource;
+          doughnutChart.update();
         }
       } catch (error) {
         console.warn('กำลังใช้ข้อมูลตัวอย่าง (หากต้องการข้อมูลจริง กรุณาตรวจสอบการตั้งค่า Deploy ของ Google Apps Script):', error);
