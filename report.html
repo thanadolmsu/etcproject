@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <!-- ส่วนที่ 1: การ์ดงบประมาณแยกตามปี (Fiscal Years Summary Cards) -->
+    <!-- ส่วนที่ 1: การ์ดงบประมาณแยกตามปี -->
     <div>
       <div class="flex items-center justify-between mb-3">
         <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">
@@ -55,7 +55,6 @@
         <span class="text-xs text-slate-400">ข้อมูลจากแท็บ FiscalYears</span>
       </div>
       <div id="fiscal-years-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- การ์ดจะถูกสร้างอัตโนมัติตามปีที่มีในระบบ -->
         <div class="bg-[#151e32] border border-slate-800 rounded-2xl p-4 animate-pulse">
           <div class="h-4 bg-slate-700 rounded w-1/3 mb-3"></div>
           <div class="h-6 bg-slate-700 rounded w-2/3"></div>
@@ -63,7 +62,7 @@
       </div>
     </div>
 
-    <!-- ส่วนที่ 2: สถิติรวมทุกปี (Overall KPI Summary) -->
+    <!-- ส่วนที่ 2: สถิติรวมทุกปี -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-[#151e32] border border-slate-800 rounded-2xl p-5 shadow-sm">
         <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">โครงการทั้งหมด</span>
@@ -99,10 +98,10 @@
       </div>
     </div>
 
-    <!-- ส่วนที่ 3: กราฟวิเคราะห์ (Charts Area) -->
+    <!-- ส่วนที่ 3: กราฟวิเคราะห์ -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
-      <!-- กราฟที่ 1: เปรียบเทียบงบประมาณรายปี (แผนงบ vs อนุมัติ vs เบิกจ่าย) -->
+      <!-- กราฟที่ 1: เปรียบเทียบงบประมาณรายปี -->
       <div class="lg:col-span-2 bg-[#151e32] border border-slate-800 rounded-2xl p-5 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
@@ -116,67 +115,48 @@
         </div>
       </div>
 
-      <!-- กราฟที่ 2: สัดส่วนสถานะโครงการทั้งหมด -->
+      <!-- กราฟที่ 2: สัดส่วนสถานะโครงการ (คิด % อัตโนมัติ) -->
       <div class="bg-[#151e32] border border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
         <div>
           <h3 class="text-base font-semibold text-slate-200">สัดส่วนสถานะโครงการ</h3>
-          <p class="text-xs text-slate-400">ภาพรวมโครงการทั้งหมดในระบบ</p>
+          <p class="text-xs text-slate-400">คิดเป็นร้อยละเทียบกับโครงการทั้งหมด</p>
         </div>
         <div class="h-64 flex items-center justify-center my-auto">
           <canvas id="statusDoughnutChart"></canvas>
         </div>
-        <div id="status-legend-custom" class="mt-2 text-xs text-slate-400 flex flex-wrap justify-center gap-3"></div>
+        <div id="status-percentage-list" class="mt-2 pt-3 border-t border-slate-800/80 space-y-1 text-xs">
+          <!-- แสดงสรุปรายการสถานะพร้อม % ด้านล่างกราฟ -->
+        </div>
       </div>
 
     </div>
   </div>
 
   <script>
-    // URL Web App จาก Apps Script ของคุณ
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY5xoZjPQ9uZSr13sT2Z85tgapsNSL6JwunNLXJjINI7_ME6DZLucKGJbAQLB8QWFVRw/exec";
 
     Chart.defaults.font.family = "'Prompt', sans-serif";
 
-    // 1. กราฟแท่งเปรียบเทียบรายปี (Grouped Bar Chart)
+    // กราฟแท่งเปรียบเทียบรายปี
     const yearlyCtx = document.getElementById('yearlyComparisonChart').getContext('2d');
     const yearlyChart = new Chart(yearlyCtx, {
       type: 'bar',
       data: {
         labels: [],
         datasets: [
-          {
-            label: 'งบจัดสรรตามแผน',
-            data: [],
-            backgroundColor: '#6366f1',
-            borderRadius: 6
-          },
-          {
-            label: 'งบที่อนุมัติ',
-            data: [],
-            backgroundColor: '#10b981',
-            borderRadius: 6
-          },
-          {
-            label: 'เบิกจ่ายจริง',
-            data: [],
-            backgroundColor: '#f59e0b',
-            borderRadius: 6
-          }
+          { label: 'งบจัดสรรตามแผน', data: [], backgroundColor: '#6366f1', borderRadius: 6 },
+          { label: 'งบที่อนุมัติ', data: [], backgroundColor: '#10b981', borderRadius: 6 },
+          { label: 'เบิกจ่ายจริง', data: [], backgroundColor: '#f59e0b', borderRadius: 6 }
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            position: 'top',
-            labels: { color: '#cbd5e1', boxWidth: 12, padding: 15, font: { size: 12 } }
-          },
+          legend: { position: 'top', labels: { color: '#cbd5e1', boxWidth: 12, padding: 15, font: { size: 12 } } },
           tooltip: {
             callbacks: {
-              label: function(ctx) {
-                return ' ' + ctx.dataset.label + ': ฿' + Number(ctx.raw).toLocaleString();
-              }
+              label: function(ctx) { return ' ' + ctx.dataset.label + ': ฿' + Number(ctx.raw).toLocaleString(); }
             }
           }
         },
@@ -193,7 +173,7 @@
       }
     });
 
-    // 2. กราฟวงกลมสถานะโครงการ
+    // กราฟวงกลมสถานะโครงการ พร้อมคำนวณ % ใน Tooltip และ Legend
     const statusCtx = document.getElementById('statusDoughnutChart').getContext('2d');
     const statusChart = new Chart(statusCtx, {
       type: 'doughnut',
@@ -201,7 +181,7 @@
         labels: [],
         datasets: [{
           data: [],
-          backgroundColor: ['#38bdf8', '#fbbf24', '#34d399', '#f87171'],
+          backgroundColor: ['#38bdf8', '#fbbf24', '#34d399', '#f87171', '#a78bfa'],
           borderWidth: 0
         }]
       },
@@ -209,13 +189,25 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 12, padding: 12 } }
+          legend: { 
+            position: 'bottom', 
+            labels: { color: '#cbd5e1', boxWidth: 12, padding: 10, font: { size: 11 } } 
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+                const value = context.raw || 0;
+                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                return ` ${context.label}: ${value} โครงการ (${percentage}%)`;
+              }
+            }
+          }
         },
         cutout: '70%'
       }
     });
 
-    // ฟังก์ชันดึงข้อมูลจาก Apps Script
     async function fetchDashboardData() {
       const statusText = document.getElementById('status-text');
       try {
@@ -245,9 +237,7 @@
       }
     }
 
-    // ฟังก์ชันจัดกลุ่มและเรนเดอร์ข้อมูลแดชบอร์ด
     function renderDashboard(projects, fiscalYears) {
-      // รวมปีงบประมาณทั้งหมด (Unique Years)
       const yearsSet = new Set();
       fiscalYears.forEach(fy => yearsSet.add(String(fy.fiscalYear)));
       projects.forEach(p => { if (p.fiscalYear) yearsSet.add(String(p.fiscalYear)); });
@@ -258,7 +248,6 @@
         yearlyStats[y] = { planned: 0, approved: 0, disbursed: 0, count: 0 };
       });
 
-      // นำงบประมาณตามแผนจากแท็บ FiscalYears มาใส่
       let totalAllPlanned = 0;
       fiscalYears.forEach(fy => {
         const y = String(fy.fiscalYear);
@@ -267,7 +256,6 @@
         totalAllPlanned += val;
       });
 
-      // รวมยอดจากโครงการ Projects
       let totalAllApproved = 0;
       let totalAllDisbursed = 0;
       let ongoingCount = 0;
@@ -291,10 +279,9 @@
         statusCounts[st] = (statusCounts[st] || 0) + 1;
       });
 
-      // 1. สร้างการ์ดแสดงงบประมาณแต่ละปี
+      // 1. การ์ดแยกปี
       const cardsContainer = document.getElementById('fiscal-years-cards');
       cardsContainer.innerHTML = '';
-
       sortedYears.forEach(year => {
         const item = yearlyStats[year];
         const disRate = item.approved > 0 ? ((item.disbursed / item.approved) * 100).toFixed(1) : 0;
@@ -325,7 +312,7 @@
         `;
       });
 
-      // 2. แสดงตัวเลขในส่วน KPI รวม
+      // 2. ข้อมูลภาพรวม KPI
       document.getElementById('kpi-total-projects').innerText = projects.length.toLocaleString();
       document.getElementById('kpi-ongoing-count').innerText = `กำลังดำเนินงาน ${ongoingCount} โครงการ`;
       document.getElementById('kpi-total-budget').innerText = '฿' + totalAllPlanned.toLocaleString();
@@ -337,24 +324,56 @@
       document.getElementById('kpi-approved-percent').innerText = `${totalAppRate}% ของงบจัดสรรทั้งหมด`;
       document.getElementById('kpi-disbursed-percent').innerText = `เบิกจ่ายแล้ว ${totalDisRate}% ของงบอนุมัติ`;
 
-      // 3. อัปเดตกราฟแท่งเปรียบเทียบรายปี
+      // 3. อัปเดตกราฟแท่งรายปี
       yearlyChart.data.labels = sortedYears.map(y => `ปี ${y}`);
       yearlyChart.data.datasets[0].data = sortedYears.map(y => yearlyStats[y].planned);
       yearlyChart.data.datasets[1].data = sortedYears.map(y => yearlyStats[y].approved);
       yearlyChart.data.datasets[2].data = sortedYears.map(y => yearlyStats[y].disbursed);
       yearlyChart.update();
 
-      // 4. อัปเดตกราฟวงกลมสถานะโครงการ
-      const statusLabels = Object.keys(statusCounts);
-      const statusValues = Object.values(statusCounts);
-      if (statusLabels.length > 0) {
-        statusChart.data.labels = statusLabels;
-        statusChart.data.datasets[0].data = statusValues;
+      // 4. คำนวณเปอร์เซ็นต์สถานะโครงการสำหรับกราฟวงกลม
+      const rawLabels = Object.keys(statusCounts);
+      const rawValues = Object.values(statusCounts);
+      const totalProjectsCount = projects.length;
+
+      if (rawLabels.length > 0) {
+        // เพิ่ม % กำกับใน Label ของกราฟโดยตรง เช่น "อนุมัติโครงการ (25.0%)"
+        const labelsWithPercent = rawLabels.map((label, idx) => {
+          const count = rawValues[idx];
+          const pct = totalProjectsCount > 0 ? ((count / totalProjectsCount) * 100).toFixed(1) : 0;
+          return `${label} (${pct}%)`;
+        });
+
+        statusChart.data.labels = labelsWithPercent;
+        statusChart.data.datasets[0].data = rawValues;
         statusChart.update();
+
+        // แสดงรายการสรุปด้านล่างวงกลมแบบมีแถบสีระบุชัดเจน
+        const colors = ['#38bdf8', '#fbbf24', '#34d399', '#f87171', '#a78bfa'];
+        const listContainer = document.getElementById('status-percentage-list');
+        listContainer.innerHTML = '';
+
+        rawLabels.forEach((label, idx) => {
+          const count = rawValues[idx];
+          const pct = totalProjectsCount > 0 ? ((count / totalProjectsCount) * 100).toFixed(1) : 0;
+          const color = colors[idx % colors.length];
+
+          listContainer.innerHTML += `
+            <div class="flex items-center justify-between py-0.5">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full" style="background-color: ${color}"></span>
+                <span class="text-slate-300">${label}</span>
+              </div>
+              <div class="font-medium text-slate-200">
+                <span>${count} โครงการ</span>
+                <span class="text-slate-400 ml-1">(${pct}%)</span>
+              </div>
+            </div>
+          `;
+        });
       }
     }
 
-    // โหลดข้อมูลอัตโนมัติเมื่อเปิดหน้าเว็บ
     window.addEventListener('DOMContentLoaded', fetchDashboardData);
   </script>
 </body>
